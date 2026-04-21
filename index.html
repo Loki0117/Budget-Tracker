@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oh Yes Events — Budget Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="global-header">
+    <div class="logo">Oh <span>Yes</span> Events</div>
+    <div class="header-actions">
+      <button class="btn btn-outline" id="exportBtn">📥 Download Excel / CSV</button>
+      <button class="btn btn-outline" id="exportFullDataBtn">📊 Get All Data</button>
+      <button class="btn btn-primary" id="emailBtn">✉️ Email Report</button>
+      <button class="btn btn-primary" id="printBtn">🖨 Print</button>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <!-- META CARD -->
+    <div class="meta-card">
+      <div class="meta-field">
+        <div class="meta-label">Client Name</div>
+        <input class="meta-input" id="metaClient" placeholder="Enter client name">
+      </div>
+      <div class="meta-field">
+        <div class="meta-label">Event Date</div>
+        <input class="meta-input" id="metaDate" type="date">
+      </div>
+      <div class="meta-field">
+        <div class="meta-label">Event Type</div>
+        <input class="meta-input" id="metaType" placeholder="e.g., Wedding, Corporate Event">
+      </div>
+      <div class="meta-field">
+        <div class="meta-label">Your Email</div>
+        <input class="meta-input" id="userEmail" placeholder="finance@yourcompany.com">
+      </div>
+    </div>
+
+    <!-- Venue Details Section -->
+    <div class="venue-card">
+      <div class="venue-header">
+        <span class="venue-icon">📍</span>
+        <span class="venue-title">Venue Details</span>
+        <span class="venue-badge">Event Location</span>
+      </div>
+      <div class="venue-grid">
+        <div class="venue-field">
+          <div class="venue-label">Venue Name</div>
+          <input class="venue-input" id="venueName" placeholder="Enter venue name">
+        </div>
+        <div class="venue-field">
+          <div class="venue-label">Venue Address</div>
+          <input class="venue-input" id="venueAddress" placeholder="Full address">
+        </div>
+        <div class="venue-field">
+          <div class="venue-label">Contact Person</div>
+          <input class="venue-input" id="venueContact" placeholder="Contact person name">
+        </div>
+        <div class="venue-field">
+          <div class="venue-label">Contact Number</div>
+          <input class="venue-input" id="venuePhone" placeholder="Phone number">
+        </div>
+        <div class="venue-field">
+          <div class="venue-label">Email Address</div>
+          <input class="venue-input" id="venueEmail" placeholder="venue@example.com">
+        </div>
+        <div class="venue-field">
+          <div class="venue-label">Agreement / Contract #</div>
+          <input class="venue-input" id="venueContract" placeholder="Contract reference">
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-container">
+      <div class="tabs" id="sectionTabs">
+        <button class="tab active" data-section="receivables">💰 Amount Receivables from Client</button>
+        <button class="tab" data-section="payables">📦 Amount Payables to Vendors</button>
+      </div>
+    </div>
+
+    <!-- SUMMARY ROW -->
+    <div class="summary-row" id="summaryRow">
+      <div class="scard">
+        <div class="scard-label">Total Invoice Value</div>
+        <div class="scard-val">₹0</div>
+        <div class="scard-sub">Incl. GST charged to client</div>
+      </div>
+      <div class="scard green">
+        <div class="scard-label">Received from Client</div>
+        <div class="scard-val">₹0</div>
+        <div class="scard-sub">₹0 still outstanding</div>
+      </div>
+      <div class="scard red">
+        <div class="scard-label">Balance Due to Vendors</div>
+        <div class="scard-val">₹0</div>
+        <div class="scard-sub">₹0 already paid</div>
+      </div>
+      <div class="scard">
+        <div class="scard-label">Gross Margin</div>
+        <div class="scard-val">₹0</div>
+        <div class="scard-sub">0% of base revenue</div>
+      </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div id="emailModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>📧 Send Budget Report</h3>
+          <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>To Email:</label>
+            <input type="email" id="emailTo" placeholder="recipient@example.com">
+          </div>
+          <div class="modal-field">
+            <label>Subject:</label>
+            <input type="text" id="emailSubject" placeholder="Budget Report">
+          </div>
+          <div class="modal-field">
+            <label>Message:</label>
+            <textarea id="emailMessage" rows="3" placeholder="Add a personal message..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="cancelEmailBtn">Cancel</button>
+          <button class="btn btn-primary" id="sendEmailBtn">Send Email</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Data Modal -->
+    <div id="allDataModal" class="modal">
+      <div class="modal-content large-modal">
+        <div class="modal-header">
+          <h3>📊 Complete Budget Data</h3>
+          <span class="close-data">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="data-actions">
+            <button class="btn btn-sm btn-outline" id="copyDataBtn">📋 Copy to Clipboard</button>
+            <button class="btn btn-sm btn-outline" id="downloadDataBtn">💾 Download JSON</button>
+          </div>
+          <div class="data-display" id="allDataDisplay"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECEIVABLES SECTION -->
+    <div id="secReceivables">
+      <div class="section-header">
+        <button class="btn btn-primary btn-sm" id="addReceivableBtn">+ Add New Row</button>
+      </div>
+      <div class="table-wrap">
+        <table id="receivablesTable">
+          <thead>
+            <tr>
+              <th style="width:40px">S.No</th>
+              <th style="min-width:180px">Elements / Description</th>
+              <th style="min-width:160px">Billing Entity Name</th>
+              <th style="min-width:130px">Oh Yes Invoice #</th>
+              <th style="width:110px">Invoice Date</th>
+              <th style="width:70px">GST%</th>
+              <th class="right" style="min-width:120px">Total Amount (₹)</th>
+              <th class="right" style="min-width:140px">Final Amount incl GST (₹)</th>
+              <th class="right" style="min-width:130px">Received Amount (₹)</th>
+              <th class="right" style="min-width:140px">Outstanding Amount (₹)</th>
+              <th style="min-width:100px">Payment Status</th>
+              <th style="min-width:200px">Additional Comments</th>
+              <th style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="receivablesBody"></tbody>
+          <tfoot>
+            <tr class="grand-total-row">
+              <td colspan="6" class="grand-total-label">GRAND TOTAL</td>
+              <td class="right grand-total-value" id="receivablesTotalAmount">₹0</td>
+              <td class="right grand-total-value" id="receivablesFinalTotal">₹0</td>
+              <td class="right grand-total-value" id="receivablesReceivedTotal">₹0</td>
+              <td class="right grand-total-value" id="receivablesOutstandingTotal">₹0</td>
+              <td colspan="2"></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAYABLES SECTION -->
+    <div id="secPayables" style="display:none">
+      <div class="section-header">
+        <button class="btn btn-primary btn-sm" id="addPayableBtn">+ Add New Vendor</button>
+      </div>
+      <div class="table-wrap">
+        <table id="payablesTable">
+          <thead>
+            <tr>
+              <th style="width:40px">S.No</th>
+              <th style="min-width:180px">Elements / Service</th>
+              <th style="min-width:160px">Vendor Name</th>
+              <th style="min-width:130px">Reference #</th>
+              <th style="width:110px">Due Date</th>
+              <th style="width:70px">GST%</th>
+              <th class="right" style="min-width:120px">Contracted Amount (₹)</th>
+              <th class="right" style="min-width:140px">Total incl GST (₹)</th>
+              <th class="right" style="min-width:130px">Paid Amount (₹)</th>
+              <th class="right" style="min-width:140px">Balance Due (₹)</th>
+              <th style="min-width:100px">Status</th>
+              <th style="min-width:200px">Comments</th>
+              <th style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="payablesBody"></tbody>
+          <tfoot>
+            <tr class="grand-total-row">
+              <td colspan="6" class="grand-total-label">GRAND TOTAL</td>
+              <td class="right grand-total-value" id="payablesTotalAmount">₹0</td>
+              <td class="right grand-total-value" id="payablesFinalTotal">₹0</td>
+              <td class="right grand-total-value" id="payablesPaidTotal">₹0</td>
+              <td class="right grand-total-value" id="payablesBalanceTotal">₹0</td>
+              <td colspan="2"></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- MARGIN NOTE -->
+    <div class="margin-note" id="marginNote">
+      <span class="margin-icon">📊</span>
+      <span id="marginText">Add receivables and payables to see your margin calculation.</span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
