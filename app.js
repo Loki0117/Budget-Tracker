@@ -136,7 +136,7 @@ function renderReceivables() {
     const tr = document.createElement('tr');
     tr.innerHTML = `<td colspan="13" style="text-align:center; padding:40px; color:#8a6e5a;">
       ✨ No data yet. Click "+ Add New Row" to start adding receivables.
-    </td>`;
+     </td>`;
     tbody.appendChild(tr);
   } else {
     receivablesData.forEach((row, i) => {
@@ -159,10 +159,10 @@ function renderReceivables() {
         <td><input class="table-input" value="${esc(row.inv)}" onchange="updateReceivable(${i}, 'inv', this.value)" placeholder="INV-000"></td>
         <td><input class="table-input" type="date" value="${row.date}" onchange="updateReceivable(${i}, 'date', this.value)"></td>
         <td><select class="gst-select" onchange="updateReceivable(${i}, 'gst', parseInt(this.value))">${gstOptions}</select></td>
-        <td class="right"><span class="computed-amount">${fmtNum(row.base)}</span></td>
-        <td class="right"><span class="computed-amount">${fmtNum(total)}</span></td>
-        <td><input class="table-input right num" type="number" value="${row.recv}" onchange="updateReceivable(${i}, 'recv', parseFloat(this.value) || 0)" placeholder="0"></td>
-        <td class="right"><span class="computed-amount ${out > 0 ? 'red' : 'green'}">${fmtNum(out)}</span></td>
+        <td class="right"><input class="table-input right num base-amount-input" type="number" value="${row.base}" onchange="updateReceivable(${i}, 'base', parseFloat(this.value) || 0)" placeholder="Enter amount" style="font-weight:600; background:#fff8f0;"></td>
+        <td class="right"><span class="computed-amount total-amount-display" style="background:#e8f5e9; font-weight:700;">${fmtNum(total)}</span></td>
+        <td class="right"><input class="table-input right num" type="number" value="${row.recv}" onchange="updateReceivable(${i}, 'recv', parseFloat(this.value) || 0)" placeholder="0"></td>
+        <td class="right"><span class="computed-amount ${out > 0 ? 'red' : 'green'} outstanding-display">${fmtNum(out)}</span></td>
         <td>
           ${statusBadge(status)}
           <div class="progress-wrap"><div class="progress-fill" style="width:${pct.toFixed(1)}%;background:${status === 'cleared' ? '#2a7a4b' : status === 'partial' ? '#ffb703' : '#e8e4dc'}"></div></div>
@@ -191,7 +191,7 @@ function renderPayables() {
     const tr = document.createElement('tr');
     tr.innerHTML = `<td colspan="13" style="text-align:center; padding:40px; color:#8a6e5a;">
       ✨ No data yet. Click "+ Add New Vendor" to start adding payables.
-    </td>`;
+     </td>`;
     tbody.appendChild(tr);
   } else {
     payablesData.forEach((row, i) => {
@@ -214,10 +214,10 @@ function renderPayables() {
         <td><input class="table-input" value="${esc(row.ref)}" onchange="updatePayable(${i}, 'ref', this.value)" placeholder="REF-000"></td>
         <td><input class="table-input" type="date" value="${row.date}" onchange="updatePayable(${i}, 'date', this.value)"></td>
         <td><select class="gst-select" onchange="updatePayable(${i}, 'gst', parseInt(this.value))">${gstOptions}</select></td>
-        <td class="right"><span class="computed-amount">${fmtNum(row.base)}</span></td>
-        <td class="right"><span class="computed-amount">${fmtNum(total)}</span></td>
-        <td><input class="table-input right num" type="number" value="${row.paid}" onchange="updatePayable(${i}, 'paid', parseFloat(this.value) || 0)" placeholder="0"></td>
-        <td class="right"><span class="computed-amount ${balance > 0 ? 'red' : 'green'}">${fmtNum(balance)}</span></td>
+        <td class="right"><input class="table-input right num contracted-amount-input" type="number" value="${row.base}" onchange="updatePayable(${i}, 'base', parseFloat(this.value) || 0)" placeholder="Enter amount" style="font-weight:600; background:#fff8f0;"></td>
+        <td class="right"><span class="computed-amount total-amount-display" style="background:#e8f5e9; font-weight:700;">${fmtNum(total)}</span></td>
+        <td class="right"><input class="table-input right num" type="number" value="${row.paid}" onchange="updatePayable(${i}, 'paid', parseFloat(this.value) || 0)" placeholder="0"></td>
+        <td class="right"><span class="computed-amount ${balance > 0 ? 'red' : 'green'} balance-display">${fmtNum(balance)}</span></td>
         <td>
           ${statusBadge(status)}
           <div class="progress-wrap"><div class="progress-fill" style="width:${pct.toFixed(1)}%;background:${status === 'cleared' ? '#2a7a4b' : status === 'partial' ? '#ffb703' : '#e8e4dc'}"></div></div>
