@@ -1,22 +1,9 @@
-// GST Options - Fixed values (user selects, no auto-change)
+// GST Options - User selectable
 const GST_OPTIONS = [0, 5, 12, 18, 28];
 
-// Initial Data with comments
-let receivablesData = [
-  { el: 'Planning & Execution Fee', entity: 'Oh Yes Events', inv: 'INV-000484', date: '2026-02-14', base: 450000, gst: 18, recv: 371700, comment: '' },
-  { el: 'Venue', entity: 'MGM Resorts', inv: 'INV-000486', date: '2026-02-22', base: 825000, gst: 18, recv: 486750, comment: '' },
-  { el: 'Photography', entity: 'Wedding Artist', inv: 'INV-000500', date: '2026-03-18', base: 495000, gst: 12, recv: 292050, comment: '' },
-  { el: 'Mehandi Artist', entity: 'Nivethetha', inv: 'INV-000503', date: '2026-03-23', base: 21350, gst: 18, recv: 12597, comment: '' },
-  { el: 'Makeup Artist', entity: 'Ratna Makeup', inv: 'INV-000525', date: '2026-04-11', base: 206000, gst: 18, recv: 121540, comment: '' }
-];
-
-let payablesData = [
-  { el: 'Venue Booking', entity: 'MGM Resorts', ref: 'VND-001', date: '2026-03-01', base: 700000, gst: 18, paid: 210000, comment: '' },
-  { el: 'Photography', entity: 'Wedding Artist', ref: 'VND-002', date: '2026-03-20', base: 420000, gst: 12, paid: 126000, comment: '' },
-  { el: 'Mehandi Artist', entity: 'Nivethetha', ref: 'VND-003', date: '2026-03-25', base: 18000, gst: 18, paid: 18000, comment: '' },
-  { el: 'Makeup Artist', entity: 'Ratna Makeup', ref: 'VND-004', date: '2026-04-15', base: 175000, gst: 18, paid: 52500, comment: '' },
-  { el: 'DJ & Sound', entity: 'Beats Co.', ref: 'VND-005', date: '2026-05-01', base: 80000, gst: 18, paid: 24000, comment: '' }
-];
+// EMPTY DATA ARRAYS - Start fresh with no sample data
+let receivablesData = [];  // Start empty - user will add rows
+let payablesData = [];     // Start empty - user will add rows
 
 // Helper Functions
 function fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN'); }
@@ -24,6 +11,7 @@ function fmtNum(n) { return Math.round(n).toLocaleString('en-IN'); }
 function fmtRaw(n) { return Math.round(n); }
 
 function getStatus(total, paid) {
+  if (total === 0) return 'outstanding';
   if (paid <= 0) return 'outstanding';
   if (paid >= total * 0.999) return 'cleared';
   return 'partial';
@@ -57,8 +45,8 @@ function getVenueDetails() {
 
 // Get complete data object for export
 function getAllData() {
-  const clientName = document.getElementById('metaClient')?.value || 'Arut & Viba';
-  const eventDate = document.getElementById('metaDate')?.value || '2027-01-23';
+  const clientName = document.getElementById('metaClient')?.value || 'Client';
+  const eventDate = document.getElementById('metaDate')?.value || '';
   const eventType = document.getElementById('metaType')?.value || '';
   const venue = getVenueDetails();
   
@@ -142,39 +130,49 @@ function renderReceivables() {
   let totalBase = 0, totalGst = 0, totalRecv = 0;
 
   tbody.innerHTML = '';
-  receivablesData.forEach((row, i) => {
-    const gstAmt = row.base * row.gst / 100;
-    const total = row.base + gstAmt;
-    const out = total - row.recv;
-    totalBase += row.base;
-    totalGst += total;
-    totalRecv += row.recv;
-
-    const pct = total > 0 ? Math.min(row.recv / total * 100, 100) : 0;
-    const status = getStatus(total, row.recv);
-    const gstOptions = GST_OPTIONS.map(g => `<option value="${g}" ${g === row.gst ? 'selected' : ''}>${g}%</option>`).join('');
-
+  
+  if (receivablesData.length === 0) {
+    // Show empty state message
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="sno-cell">${i + 1}</td>
-      <td><input class="table-input" value="${esc(row.el)}" onchange="updateReceivable(${i}, 'el', this.value)"></td>
-      <td><input class="table-input" value="${esc(row.entity)}" onchange="updateReceivable(${i}, 'entity', this.value)"></td>
-      <td><input class="table-input" value="${esc(row.inv)}" onchange="updateReceivable(${i}, 'inv', this.value)"></td>
-      <td><input class="table-input" type="date" value="${row.date}" onchange="updateReceivable(${i}, 'date', this.value)"></td>
-      <td><select class="gst-select" onchange="updateReceivable(${i}, 'gst', parseInt(this.value))">${gstOptions}</select></td>
-      <td class="right"><span class="computed-amount">${fmtNum(row.base)}</span></td>
-      <td class="right"><span class="computed-amount">${fmtNum(total)}</span></td>
-      <td><input class="table-input right num" type="number" value="${row.recv}" onchange="updateReceivable(${i}, 'recv', parseFloat(this.value) || 0)"></td>
-      <td class="right"><span class="computed-amount ${out > 0 ? 'red' : 'green'}">${fmtNum(out)}</span></td>
-      <td>
-        ${statusBadge(status)}
-        <div class="progress-wrap"><div class="progress-fill" style="width:${pct.toFixed(1)}%;background:${status === 'cleared' ? '#2a7a4b' : status === 'partial' ? '#c87a1a' : '#e8e4dc'}"></div></div>
-      </td>
-      <td><input class="comments-input" value="${esc(row.comment || '')}" placeholder="Add comment..." onchange="updateReceivable(${i}, 'comment', this.value)"></td>
-      <td><button class="del-btn" onclick="deleteReceivable(${i})">×</button></td>
-    `;
+    tr.innerHTML = `<td colspan="13" style="text-align:center; padding:40px; color:#8a6e5a;">
+      ✨ No data yet. Click "+ Add New Row" to start adding receivables.
+    </td>`;
     tbody.appendChild(tr);
-  });
+  } else {
+    receivablesData.forEach((row, i) => {
+      const gstAmt = row.base * row.gst / 100;
+      const total = row.base + gstAmt;
+      const out = total - row.recv;
+      totalBase += row.base;
+      totalGst += total;
+      totalRecv += row.recv;
+
+      const pct = total > 0 ? Math.min(row.recv / total * 100, 100) : 0;
+      const status = getStatus(total, row.recv);
+      const gstOptions = GST_OPTIONS.map(g => `<option value="${g}" ${g === row.gst ? 'selected' : ''}>${g}%</option>`).join('');
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="sno-cell">${i + 1}</td>
+        <td><input class="table-input" value="${esc(row.el)}" onchange="updateReceivable(${i}, 'el', this.value)" placeholder="Enter description"></td>
+        <td><input class="table-input" value="${esc(row.entity)}" onchange="updateReceivable(${i}, 'entity', this.value)" placeholder="Entity name"></td>
+        <td><input class="table-input" value="${esc(row.inv)}" onchange="updateReceivable(${i}, 'inv', this.value)" placeholder="INV-000"></td>
+        <td><input class="table-input" type="date" value="${row.date}" onchange="updateReceivable(${i}, 'date', this.value)"></td>
+        <td><select class="gst-select" onchange="updateReceivable(${i}, 'gst', parseInt(this.value))">${gstOptions}</select></td>
+        <td class="right"><span class="computed-amount">${fmtNum(row.base)}</span></td>
+        <td class="right"><span class="computed-amount">${fmtNum(total)}</span></td>
+        <td><input class="table-input right num" type="number" value="${row.recv}" onchange="updateReceivable(${i}, 'recv', parseFloat(this.value) || 0)" placeholder="0"></td>
+        <td class="right"><span class="computed-amount ${out > 0 ? 'red' : 'green'}">${fmtNum(out)}</span></td>
+        <td>
+          ${statusBadge(status)}
+          <div class="progress-wrap"><div class="progress-fill" style="width:${pct.toFixed(1)}%;background:${status === 'cleared' ? '#2a7a4b' : status === 'partial' ? '#ffb703' : '#e8e4dc'}"></div></div>
+        </td>
+        <td><input class="comments-input" value="${esc(row.comment || '')}" placeholder="Add comment..." onchange="updateReceivable(${i}, 'comment', this.value)"></td>
+        <td><button class="del-btn" onclick="deleteReceivable(${i})">×</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 
   document.getElementById('receivablesTotalAmount').textContent = fmt(totalBase);
   document.getElementById('receivablesFinalTotal').textContent = fmt(totalGst);
@@ -188,39 +186,48 @@ function renderPayables() {
   let totalBase = 0, totalGst = 0, totalPaid = 0;
 
   tbody.innerHTML = '';
-  payablesData.forEach((row, i) => {
-    const gstAmt = row.base * row.gst / 100;
-    const total = row.base + gstAmt;
-    const balance = total - row.paid;
-    totalBase += row.base;
-    totalGst += total;
-    totalPaid += row.paid;
-
-    const pct = total > 0 ? Math.min(row.paid / total * 100, 100) : 0;
-    const status = getStatus(total, row.paid);
-    const gstOptions = GST_OPTIONS.map(g => `<option value="${g}" ${g === row.gst ? 'selected' : ''}>${g}%</option>`).join('');
-
+  
+  if (payablesData.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="sno-cell">${i + 1}</td>
-      <td><input class="table-input" value="${esc(row.el)}" onchange="updatePayable(${i}, 'el', this.value)"></td>
-      <td><input class="table-input" value="${esc(row.entity)}" onchange="updatePayable(${i}, 'entity', this.value)"></td>
-      <td><input class="table-input" value="${esc(row.ref)}" onchange="updatePayable(${i}, 'ref', this.value)"></td>
-      <td><input class="table-input" type="date" value="${row.date}" onchange="updatePayable(${i}, 'date', this.value)"></td>
-      <td><select class="gst-select" onchange="updatePayable(${i}, 'gst', parseInt(this.value))">${gstOptions}</select></td>
-      <td class="right"><span class="computed-amount">${fmtNum(row.base)}</span></td>
-      <td class="right"><span class="computed-amount">${fmtNum(total)}</span></td>
-      <td><input class="table-input right num" type="number" value="${row.paid}" onchange="updatePayable(${i}, 'paid', parseFloat(this.value) || 0)"></td>
-      <td class="right"><span class="computed-amount ${balance > 0 ? 'red' : 'green'}">${fmtNum(balance)}</span></td>
-      <td>
-        ${statusBadge(status)}
-        <div class="progress-wrap"><div class="progress-fill" style="width:${pct.toFixed(1)}%;background:${status === 'cleared' ? '#2a7a4b' : status === 'partial' ? '#c87a1a' : '#e8e4dc'}"></div></div>
-      </td>
-      <td><input class="comments-input" value="${esc(row.comment || '')}" placeholder="Add comment..." onchange="updatePayable(${i}, 'comment', this.value)"></td>
-      <td><button class="del-btn" onclick="deletePayable(${i})">×</button></td>
-    `;
+    tr.innerHTML = `<td colspan="13" style="text-align:center; padding:40px; color:#8a6e5a;">
+      ✨ No data yet. Click "+ Add New Vendor" to start adding payables.
+    </td>`;
     tbody.appendChild(tr);
-  });
+  } else {
+    payablesData.forEach((row, i) => {
+      const gstAmt = row.base * row.gst / 100;
+      const total = row.base + gstAmt;
+      const balance = total - row.paid;
+      totalBase += row.base;
+      totalGst += total;
+      totalPaid += row.paid;
+
+      const pct = total > 0 ? Math.min(row.paid / total * 100, 100) : 0;
+      const status = getStatus(total, row.paid);
+      const gstOptions = GST_OPTIONS.map(g => `<option value="${g}" ${g === row.gst ? 'selected' : ''}>${g}%</option>`).join('');
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="sno-cell">${i + 1}</td>
+        <td><input class="table-input" value="${esc(row.el)}" onchange="updatePayable(${i}, 'el', this.value)" placeholder="Service description"></td>
+        <td><input class="table-input" value="${esc(row.entity)}" onchange="updatePayable(${i}, 'entity', this.value)" placeholder="Vendor name"></td>
+        <td><input class="table-input" value="${esc(row.ref)}" onchange="updatePayable(${i}, 'ref', this.value)" placeholder="REF-000"></td>
+        <td><input class="table-input" type="date" value="${row.date}" onchange="updatePayable(${i}, 'date', this.value)"></td>
+        <td><select class="gst-select" onchange="updatePayable(${i}, 'gst', parseInt(this.value))">${gstOptions}</select></td>
+        <td class="right"><span class="computed-amount">${fmtNum(row.base)}</span></td>
+        <td class="right"><span class="computed-amount">${fmtNum(total)}</span></td>
+        <td><input class="table-input right num" type="number" value="${row.paid}" onchange="updatePayable(${i}, 'paid', parseFloat(this.value) || 0)" placeholder="0"></td>
+        <td class="right"><span class="computed-amount ${balance > 0 ? 'red' : 'green'}">${fmtNum(balance)}</span></td>
+        <td>
+          ${statusBadge(status)}
+          <div class="progress-wrap"><div class="progress-fill" style="width:${pct.toFixed(1)}%;background:${status === 'cleared' ? '#2a7a4b' : status === 'partial' ? '#ffb703' : '#e8e4dc'}"></div></div>
+        </td>
+        <td><input class="comments-input" value="${esc(row.comment || '')}" placeholder="Add comment..." onchange="updatePayable(${i}, 'comment', this.value)"></td>
+        <td><button class="del-btn" onclick="deletePayable(${i})">×</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 
   document.getElementById('payablesTotalAmount').textContent = fmt(totalBase);
   document.getElementById('payablesFinalTotal').textContent = fmt(totalGst);
@@ -242,35 +249,45 @@ function updatePayable(index, field, value) {
 }
 
 function deleteReceivable(index) {
-  if (receivablesData.length > 1) {
-    receivablesData.splice(index, 1);
-  } else {
-    receivablesData[index] = { el: '', entity: '', inv: '', date: '', base: 0, gst: 18, recv: 0, comment: '' };
-  }
+  receivablesData.splice(index, 1);
   renderReceivables();
   renderSummary();
 }
 
 function deletePayable(index) {
-  if (payablesData.length > 1) {
-    payablesData.splice(index, 1);
-  } else {
-    payablesData[index] = { el: '', entity: '', ref: '', date: '', base: 0, gst: 18, paid: 0, comment: '' };
-  }
+  payablesData.splice(index, 1);
   renderPayables();
   renderSummary();
 }
 
 function addReceivable() {
   const today = new Date().toISOString().slice(0, 10);
-  receivablesData.push({ el: '', entity: '', inv: '', date: today, base: 0, gst: 18, recv: 0, comment: '' });
+  receivablesData.push({ 
+    el: '', 
+    entity: '', 
+    inv: '', 
+    date: today, 
+    base: 0, 
+    gst: 18, 
+    recv: 0, 
+    comment: '' 
+  });
   renderReceivables();
   renderSummary();
 }
 
 function addPayable() {
   const today = new Date().toISOString().slice(0, 10);
-  payablesData.push({ el: '', entity: '', ref: '', date: today, base: 0, gst: 18, paid: 0, comment: '' });
+  payablesData.push({ 
+    el: '', 
+    entity: '', 
+    ref: '', 
+    date: today, 
+    base: 0, 
+    gst: 18, 
+    paid: 0, 
+    comment: '' 
+  });
   renderPayables();
   renderSummary();
 }
@@ -326,44 +343,42 @@ function renderSummary() {
   document.getElementById('marginText').innerHTML = `<strong>Margin insight:</strong> Base revenue: ${fmt(rBase)} | Vendor costs: ${fmt(pBase)} | Gross margin: <strong style="color:${marginPct >= 18 ? 'var(--green)' : marginPct >= 10 ? 'var(--gold)' : 'var(--red)'}">${fmt(margin)} (${marginPct.toFixed(1)}%)</strong>`;
 }
 
-// EXACT CSV/EXCEL Export matching your screenshot format
+// Export to Excel/CSV
 function exportToExcel() {
-  const clientName = document.getElementById('metaClient')?.value || 'Arut & Viba';
-  const eventDate = document.getElementById('metaDate')?.value || '2027-01-23';
+  const clientName = document.getElementById('metaClient')?.value || 'Budget_Tracker';
+  const eventDate = document.getElementById('metaDate')?.value || '';
   const eventType = document.getElementById('metaType')?.value || '';
   const venue = getVenueDetails();
   
   let csvRows = [];
   
-  // Header
-  csvRows.push([`"${clientName}_Budget Tracker"`]);
+  csvRows.push([`"${clientName}_Budget_Tracker"`]);
   csvRows.push([]);
-  csvRows.push(['Menu']);
-  csvRows.push(['File', 'Edit', 'View', 'Insert', 'Format', 'Data', 'Tools', 'Gemini', 'Extensions', 'Help']);
-  csvRows.push([]);
-  csvRows.push(['AtM25']);
-  csvRows.push(['A']);
+  csvRows.push([`Generated On:`, new Date().toLocaleString()]);
   csvRows.push([`Client Name:`, clientName]);
   csvRows.push([`Event Date:`, eventDate]);
   if (eventType) csvRows.push([`Event Type:`, eventType]);
   csvRows.push([]);
-  csvRows.push([`Venue Details:`]);
-  if (venue.venueName) csvRows.push([`Venue Name:`, venue.venueName]);
-  if (venue.venueAddress) csvRows.push([`Address:`, venue.venueAddress]);
-  if (venue.venueContact) csvRows.push([`Contact Person:`, venue.venueContact]);
-  if (venue.venuePhone) csvRows.push([`Phone:`, venue.venuePhone]);
-  if (venue.venueEmail) csvRows.push([`Email:`, venue.venueEmail]);
-  if (venue.venueContract) csvRows.push([`Contract #:`, venue.venueContract]);
-  csvRows.push([]);
   
-  // RECEIVABLES Table Header (matches your screenshot)
+  if (venue.venueName) {
+    csvRows.push([`Venue Details:`]);
+    if (venue.venueName) csvRows.push([`Venue Name:`, venue.venueName]);
+    if (venue.venueAddress) csvRows.push([`Address:`, venue.venueAddress]);
+    if (venue.venueContact) csvRows.push([`Contact Person:`, venue.venueContact]);
+    if (venue.venuePhone) csvRows.push([`Phone:`, venue.venuePhone]);
+    if (venue.venueEmail) csvRows.push([`Email:`, venue.venueEmail]);
+    if (venue.venueContract) csvRows.push([`Contract #:`, venue.venueContract]);
+    csvRows.push([]);
+  }
+  
+  // Receivables Header
+  csvRows.push(['=== RECEIVABLES ===']);
   csvRows.push([
-    'S.no', 'Elements', 'Billing Entity Name', 'Oh Yes Invoice #', 'Invoice Date',
-    'Actual Amount Received Date', 'Total Amount', 'Final Amount including GST',
-    'Received Amount', 'Outstanding Amount', 'Payment Status', 'Additional Comments'
+    'S.no', 'Elements', 'Billing Entity', 'Invoice #', 'Invoice Date',
+    'Base Amount', 'GST %', 'Total incl GST', 'Received Amount', 
+    'Outstanding Amount', 'Payment Status', 'Comments'
   ]);
   
-  // Receivables Data
   let rTotalBase = 0, rTotalGst = 0, rTotalRecv = 0;
   receivablesData.forEach((row, i) => {
     const gstAmt = row.base * row.gst / 100;
@@ -374,37 +389,23 @@ function exportToExcel() {
     rTotalRecv += row.recv;
     
     csvRows.push([
-      i + 1,
-      row.el,
-      row.entity,
-      row.inv,
-      row.date,
-      '', // Actual Amount Received Date (can be added later)
-      fmtRaw(row.base),
-      fmtRaw(total),
-      fmtRaw(row.recv),
-      fmtRaw(out),
-      getStatus(total, row.recv).toUpperCase(),
+      i + 1, row.el, row.entity, row.inv, row.date,
+      fmtRaw(row.base), row.gst + '%', fmtRaw(total), 
+      fmtRaw(row.recv), fmtRaw(out), getStatus(total, row.recv).toUpperCase(), 
       row.comment || ''
     ]);
   });
   
-  // Grand Total row for Receivables
-  csvRows.push([]);
-  csvRows.push([
-    'Grand Total:', '', '', '', '',
-    '', fmtRaw(rTotalBase), fmtRaw(rTotalGst), fmtRaw(rTotalRecv), fmtRaw(rTotalGst - rTotalRecv), '', ''
-  ]);
-  csvRows.push([]);
+  csvRows.push([`GRAND TOTAL:`, '', '', '', '', fmtRaw(rTotalBase), '', fmtRaw(rTotalGst), fmtRaw(rTotalRecv), fmtRaw(rTotalGst - rTotalRecv), '', '']);
   csvRows.push([]);
   
-  // PAYABLES Table Header
+  // Payables Header
+  csvRows.push(['=== PAYABLES ===']);
   csvRows.push([
-    'S.no', 'Elements / Service', 'Vendor Name', 'Reference #', 'Due Date',
-    'Contracted Amount', 'GST %', 'Total incl GST', 'Paid Amount', 'Balance Due', 'Status', 'Comments'
+    'S.no', 'Service', 'Vendor Name', 'Reference #', 'Due Date',
+    'Contracted', 'GST %', 'Total incl GST', 'Paid Amount', 'Balance Due', 'Status', 'Comments'
   ]);
   
-  // Payables Data
   let pTotalBase = 0, pTotalGst = 0, pTotalPaid = 0;
   payablesData.forEach((row, i) => {
     const gstAmt = row.base * row.gst / 100;
@@ -415,53 +416,35 @@ function exportToExcel() {
     pTotalPaid += row.paid;
     
     csvRows.push([
-      i + 1,
-      row.el,
-      row.entity,
-      row.ref,
-      row.date,
-      fmtRaw(row.base),
-      row.gst + '%',
-      fmtRaw(total),
-      fmtRaw(row.paid),
-      fmtRaw(balance),
-      getStatus(total, row.paid).toUpperCase(),
+      i + 1, row.el, row.entity, row.ref, row.date,
+      fmtRaw(row.base), row.gst + '%', fmtRaw(total), 
+      fmtRaw(row.paid), fmtRaw(balance), getStatus(total, row.paid).toUpperCase(),
       row.comment || ''
     ]);
   });
   
-  // Grand Total row for Payables
-  csvRows.push([]);
-  csvRows.push([
-    'Grand Total:', '', '', '', '',
-    fmtRaw(pTotalBase), '', fmtRaw(pTotalGst), fmtRaw(pTotalPaid), fmtRaw(pTotalGst - pTotalPaid), '', ''
-  ]);
+  csvRows.push([`GRAND TOTAL:`, '', '', '', '', fmtRaw(pTotalBase), '', fmtRaw(pTotalGst), fmtRaw(pTotalPaid), fmtRaw(pTotalGst - pTotalPaid), '', '']);
   csvRows.push([]);
   
-  // Summary Section
+  // Summary
   const margin = rTotalBase - pTotalBase;
   const marginPct = rTotalBase > 0 ? (margin / rTotalBase * 100) : 0;
   
   csvRows.push(['=== SUMMARY ===']);
-  csvRows.push([`Total Invoiced to Client (with GST):`, fmtRaw(rTotalGst)]);
+  csvRows.push([`Total Invoiced to Client:`, fmtRaw(rTotalGst)]);
   csvRows.push([`Received from Client:`, fmtRaw(rTotalRecv)]);
   csvRows.push([`Outstanding from Client:`, fmtRaw(rTotalGst - rTotalRecv)]);
-  csvRows.push([`Total Vendor Liability (with GST):`, fmtRaw(pTotalGst)]);
+  csvRows.push([`Total Vendor Liability:`, fmtRaw(pTotalGst)]);
   csvRows.push([`Paid to Vendors:`, fmtRaw(pTotalPaid)]);
   csvRows.push([`Balance Due to Vendors:`, fmtRaw(pTotalGst - pTotalPaid)]);
   csvRows.push([`Gross Margin:`, `${fmtRaw(margin)} (${marginPct.toFixed(1)}%)`]);
-  csvRows.push([]);
-  csvRows.push([`Report Generated On:`, new Date().toLocaleString()]);
   
-  // Convert to CSV string
   const csvContent = csvRows.map(row => row.join(',')).join('\n');
-  
-  // Download as CSV/Excel
   const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   link.href = url;
-  link.setAttribute('download', `${clientName.replace(/\s+/g, '_')}_Budget_Tracker_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.setAttribute('download', `${clientName.replace(/\s+/g, '_')}_Budget_${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -489,7 +472,7 @@ function copyDataToClipboard() {
 
 function downloadAsJSON() {
   const data = getAllData();
-  const client = document.getElementById('metaClient')?.value || 'client';
+  const client = document.getElementById('metaClient')?.value || 'budget';
   const jsonStr = JSON.stringify(data, null, 2);
   const blob = new Blob([jsonStr], { type: 'application/json' });
   const a = document.createElement('a');
