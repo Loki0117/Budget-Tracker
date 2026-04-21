@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oh Yes Events — Receivables Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="global-header">
+    <div class="logo">Oh <span>Yes</span> Events</div>
+    <div class="header-actions">
+      <a href="index.html" class="btn" style="text-decoration:none;">🏠 Dashboard</a>
+      <a href="payables.html" class="btn" style="text-decoration:none;">📦 Payables</a>
+      <button class="btn" id="exportReceivablesBtn">⬇ Export CSV</button>
+      <button class="btn primary" id="printReceivablesBtn">🖨 Print</button>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <div class="meta-card">
+      <div class="meta-field">
+        <div class="meta-label">Client Name</div>
+        <input class="meta-input" id="metaClient" value="Arut & Viba" placeholder="Client name">
+      </div>
+      <div class="meta-field">
+        <div class="meta-label">Event Date</div>
+        <input class="meta-input" id="metaDate" type="date" value="2027-01-23">
+      </div>
+      <div class="meta-field">
+        <div class="meta-label">Event Type</div>
+        <input class="meta-input" id="metaType" value="South Indian × North Indian Wedding">
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div>
+        <div class="section-title">💰 Amount Receivables from Client</div>
+        <div class="section-note">Track invoices, GST, payments and outstanding amounts</div>
+      </div>
+      <button class="btn sm" id="addRowBtn">+ Add row</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="receivablesTable">
+        <thead>
+          <tr>
+            <th style="width:36px">S.No</th>
+            <th>Element / Description</th>
+            <th>Billing Entity</th>
+            <th>Invoice #</th>
+            <th>Invoice Date</th>
+            <th class="right">Base Amount (₹)</th>
+            <th style="width:80px">GST %</th>
+            <th class="right">Total incl. GST (₹)</th>
+            <th class="right">Received (₹)</th>
+            <th class="right">Outstanding (₹)</th>
+            <th>Status</th>
+            <th style="width:32px"></th>
+          </tr>
+        </thead>
+        <tbody id="receivablesBody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" class="big">Grand Total</td>
+            <td class="right big" id="baseTotal">₹0</td>
+            <td></td>
+            <td class="right big" id="gstTotal">₹0</td>
+            <td class="right big" id="receivedTotal">₹0</td>
+            <td class="right big" id="outstandingTotal">₹0</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="summary-card" id="summaryCard">
+      <div class="summary-stats">
+        <div class="stat">
+          <div class="stat-label">Total Invoiced</div>
+          <div class="stat-value" id="statTotal">₹0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Received</div>
+          <div class="stat-value green" id="statReceived">₹0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Outstanding</div>
+          <div class="stat-value red" id="statOutstanding">₹0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Collection Rate</div>
+          <div class="stat-value" id="statRate">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="receivables.js"></script>
+</body>
+</html>
