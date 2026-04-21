@@ -23,23 +23,23 @@
     <div class="meta-card">
       <div class="meta-field">
         <div class="meta-label">Client Name</div>
-        <input class="meta-input" id="metaClient" value="Arut & Viba" placeholder="Client name">
+        <input class="meta-input" id="metaClient" placeholder="Enter client name">
       </div>
       <div class="meta-field">
         <div class="meta-label">Event Date</div>
-        <input class="meta-input" id="metaDate" type="date" value="2027-01-23">
+        <input class="meta-input" id="metaDate" type="date">
       </div>
       <div class="meta-field">
         <div class="meta-label">Event Type</div>
-        <input class="meta-input" id="metaType" value="South Indian × North Indian Wedding" placeholder="Event type">
+        <input class="meta-input" id="metaType" placeholder="e.g., Wedding, Corporate Event">
       </div>
       <div class="meta-field">
         <div class="meta-label">Your Email</div>
-        <input class="meta-input" id="userEmail" value="finance@ohyesevents.com" placeholder="Your email">
+        <input class="meta-input" id="userEmail" placeholder="finance@yourcompany.com">
       </div>
     </div>
 
-    <!-- Venue Details Section - Orange Theme -->
+    <!-- Venue Details Section -->
     <div class="venue-card">
       <div class="venue-header">
         <span class="venue-icon">📍</span>
@@ -49,32 +49,32 @@
       <div class="venue-grid">
         <div class="venue-field">
           <div class="venue-label">Venue Name</div>
-          <input class="venue-input" id="venueName" value="MGM Resorts & Convention Center" placeholder="Venue name">
+          <input class="venue-input" id="venueName" placeholder="Enter venue name">
         </div>
         <div class="venue-field">
           <div class="venue-label">Venue Address</div>
-          <input class="venue-input" id="venueAddress" value="123 Luxury Lane, Bangalore - 560001" placeholder="Full address">
+          <input class="venue-input" id="venueAddress" placeholder="Full address">
         </div>
         <div class="venue-field">
           <div class="venue-label">Contact Person</div>
-          <input class="venue-input" id="venueContact" value="Mr. Rajesh Kumar" placeholder="Contact person">
+          <input class="venue-input" id="venueContact" placeholder="Contact person name">
         </div>
         <div class="venue-field">
           <div class="venue-label">Contact Number</div>
-          <input class="venue-input" id="venuePhone" value="+91 98765 43210" placeholder="Phone number">
+          <input class="venue-input" id="venuePhone" placeholder="Phone number">
         </div>
         <div class="venue-field">
           <div class="venue-label">Email Address</div>
-          <input class="venue-input" id="venueEmail" value="events@mgmresorts.com" placeholder="Email">
+          <input class="venue-input" id="venueEmail" placeholder="venue@example.com">
         </div>
         <div class="venue-field">
           <div class="venue-label">Agreement / Contract #</div>
-          <input class="venue-input" id="venueContract" value="MGM-CONT-2026-001" placeholder="Contract number">
+          <input class="venue-input" id="venueContract" placeholder="Contract reference">
         </div>
       </div>
     </div>
 
-    <!-- TABS - Orange Theme -->
+    <!-- TABS -->
     <div class="tabs-container">
       <div class="tabs" id="sectionTabs">
         <button class="tab active" data-section="receivables">💰 Amount Receivables from Client</button>
@@ -83,7 +83,28 @@
     </div>
 
     <!-- SUMMARY ROW -->
-    <div class="summary-row" id="summaryRow"></div>
+    <div class="summary-row" id="summaryRow">
+      <div class="scard">
+        <div class="scard-label">Total Invoice Value</div>
+        <div class="scard-val">₹0</div>
+        <div class="scard-sub">Incl. GST charged to client</div>
+      </div>
+      <div class="scard green">
+        <div class="scard-label">Received from Client</div>
+        <div class="scard-val">₹0</div>
+        <div class="scard-sub">₹0 still outstanding</div>
+      </div>
+      <div class="scard red">
+        <div class="scard-label">Balance Due to Vendors</div>
+        <div class="scard-val">₹0</div>
+        <div class="scard-sub">₹0 already paid</div>
+      </div>
+      <div class="scard">
+        <div class="scard-label">Gross Margin</div>
+        <div class="scard-val">₹0</div>
+        <div class="scard-sub">0% of base revenue</div>
+      </div>
+    </div>
 
     <!-- Email Modal -->
     <div id="emailModal" class="modal">
@@ -99,11 +120,11 @@
           </div>
           <div class="modal-field">
             <label>Subject:</label>
-            <input type="text" id="emailSubject" value="Budget Report">
+            <input type="text" id="emailSubject" placeholder="Budget Report">
           </div>
           <div class="modal-field">
             <label>Message:</label>
-            <textarea id="emailMessage" rows="3" placeholder="Add a message..."></textarea>
+            <textarea id="emailMessage" rows="3" placeholder="Add a personal message..."></textarea>
           </div>
         </div>
         <div class="modal-footer">
@@ -210,10 +231,10 @@
       </div>
     </div>
 
-    <!-- MARGIN NOTE - Orange Theme -->
+    <!-- MARGIN NOTE -->
     <div class="margin-note" id="marginNote">
       <span class="margin-icon">📊</span>
-      <span id="marginText">Fill in both receivables and payables to see your margin.</span>
+      <span id="marginText">Add receivables and payables to see your margin calculation.</span>
     </div>
   </div>
 
